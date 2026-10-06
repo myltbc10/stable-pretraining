@@ -246,6 +246,7 @@ REFERENCE_LOSSES = {
     "byol": ("fit/loss_epoch", 1.822302222251892),
     "vicreg": ("fit/loss_epoch", 18.119741439819336),
     "barlow_twins": ("fit/loss_epoch", 1.7105509042739868),
+    "twist": ("fit/loss_epoch", -0.3513243794441223),
     "supervised": ("validate/loss_step", 2.3338754177093506),
 }
 
