@@ -197,6 +197,21 @@ def build_barlow_twins():
     )
 
 
+def build_twist():
+    return dict(
+        module=spt.Module(
+            backbone=make_backbone(),
+            projector=nn.Sequential(
+                make_projector(), nn.BatchNorm1d(PROJ_DIM, affine=False)
+            ),
+            forward=forward.twist,
+            twist_loss=losses.TWISTLoss(),
+            optim={"optimizer": {"type": "Adam", "lr": 1e-3}},
+        ),
+        data=make_data(multi_view=True),
+    )
+
+
 def build_supervised():
     return dict(
         module=spt.Module(
@@ -219,6 +234,7 @@ METHOD_BUILDERS = {
     "byol": build_byol,
     "vicreg": build_vicreg,
     "barlow_twins": build_barlow_twins,
+    "twist": build_twist,
     "supervised": build_supervised,
 }
 
