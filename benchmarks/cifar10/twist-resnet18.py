@@ -8,6 +8,7 @@ run, the loss/normalisation ablations and unsupervised classification:
   unsupervised classification against the CIFAR-10 labels.
 - ``HIDDEN_DIM`` (2048): width of the two hidden layers of the head.
 - ``BASE_LR`` (0.5): LARS learning rate for batch size 256, scaled linearly.
+- ``SEED`` (0): seed passed to ``spt.Manager``.
 - ``VARIANT`` (``full``): one of ``full``, ``no_sharpness``, ``no_diversity``,
   ``no_nbs`` (drops the batch normalisation before the softmax).
 - ``LIMIT_TRAIN_BATCHES`` / ``LIMIT_VAL_BATCHES``: for quick smoke runs.
@@ -189,6 +190,7 @@ def main():
     n_classes = int(os.environ.get("N_CLASSES", 2048))
     hidden_dim = int(os.environ.get("HIDDEN_DIM", 2048))
     base_lr = float(os.environ.get("BASE_LR", 0.5))
+    seed = int(os.environ.get("SEED", 0))
     variant = os.environ.get("VARIANT", "full")
     if variant not in VARIANTS:
         raise ValueError(f"VARIANT must be one of {sorted(VARIANTS)}, got {variant!r}")
@@ -218,6 +220,7 @@ def main():
             "batch_size": batch_size,
             "base_lr": base_lr,
             "max_epochs": max_epochs,
+            "seed": seed,
         },
         twist_loss=spt.losses.TWISTLoss(
             sharpness_weight=sharpness_weight, diversity_weight=diversity_weight
@@ -281,7 +284,7 @@ def main():
         **limits,
     )
 
-    manager = spt.Manager(trainer=trainer, module=module, data=data)
+    manager = spt.Manager(trainer=trainer, module=module, data=data, seed=seed)
     manager()
 
     if torch.cuda.is_available():
