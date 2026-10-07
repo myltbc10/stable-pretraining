@@ -201,6 +201,18 @@ def test_twist_loss_every_term_is_differentiable():
         assert g1.abs().sum() > 0 and g2.abs().sum() > 0, key
 
 
+@pytest.mark.parametrize("term", ["consistency", "sharpness", "diversity", "loss"])
+def test_twist_loss_gradients_match_finite_differences(term):
+    # Finite-difference check of the analytic gradient of each term, including
+    # the eps-free ``xlogy`` path in the diversity entropy. float64 so the
+    # numerical derivative is accurate to the gradcheck tolerance.
+    torch.manual_seed(9)
+    z1 = torch.randn(4, 6, dtype=torch.float64, requires_grad=True)
+    z2 = torch.randn(4, 6, dtype=torch.float64, requires_grad=True)
+    loss = TWISTLoss(sharpness_weight=1.5, diversity_weight=0.75)
+    assert torch.autograd.gradcheck(lambda a, b: loss.terms(a, b)[term], (z1, z2))
+
+
 def test_twist_loss_is_finite_for_extreme_logits_and_low_precision_inputs():
     # At this scale the softmax underflows to exact zeros in float32, which
     # would turn a naive ``p * log(p)`` into ``0 * -inf = nan``.
