@@ -624,8 +624,7 @@ def twist(self, batch: dict[str, Any], stage: str) -> dict[str, torch.Tensor]:
     Args:
         self: Module instance (automatically bound) with required attributes:
             - backbone: Feature extraction network
-            - projector: Classification head mapping features to ``C`` class
-              logits. It must end with ``BatchNorm1d(C, affine=False)``
+            - projector: Classification head ending with ``BatchNorm1d(C, affine=False)``
             - twist_loss: TWIST loss function (``spt.losses.TWISTLoss``)
         batch: Either a list of view dicts (from MultiViewTransform) or
             a single dict (for validation/single-view)
