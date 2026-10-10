@@ -1,15 +1,17 @@
 """TWIST ViT-S/16 on ImageNet-10 (Imagenette). 20 epochs, 1 GPU, no W&B.
 
-Two-view TWIST with the paper's ViT settings for the loss (sharpness weight
-0.4, diversity weight 1.0) and optimizer (AdamW, lr 3e-4 per 256 samples,
-weight decay 0.06, 10 warmup epochs then cosine). The momentum encoder and
-multi-crop of the paper's ViT recipe are not used.
+Two-view TWIST with the paper's ViT optimizer settings (AdamW, lr 3e-4 per
+256 samples, weight decay 0.06, 10 warmup epochs then cosine) and the default
+loss weights (sharpness 1.0, diversity 1.0). The momentum encoder and
+multi-crop of the paper's ViT recipe are not used, and without the momentum
+encoder the paper's ViT sharpness weight of 0.4 collapses to uniform
+predictions within 20 epochs (loss = (0.4 - 1) * ln C, probes at chance).
 
 Imagenette is loaded through ``torchvision.datasets.Imagenette`` (the official
 fastai archive, 9,469 train / 3,925 val) with the shared two-view transforms.
 
 Environment variables: ``MAX_EPOCHS`` (default 20; use 200 for the RESULTS.md
-table), ``NUM_WORKERS`` (8), ``BASE_LR`` (3e-4) and ``SHARPNESS_WEIGHT`` (0.4).
+table), ``NUM_WORKERS`` (8), ``BASE_LR`` (3e-4) and ``SHARPNESS_WEIGHT`` (1.0).
 """
 
 import os
@@ -70,7 +72,7 @@ def main():
     max_epochs = int(os.environ.get("MAX_EPOCHS", 20))
     num_workers = int(os.environ.get("NUM_WORKERS", 8))
     base_lr = float(os.environ.get("BASE_LR", 3e-4))
-    sharpness_weight = float(os.environ.get("SHARPNESS_WEIGHT", 0.4))
+    sharpness_weight = float(os.environ.get("SHARPNESS_WEIGHT", 1.0))
 
     data = make_imagenette_data(batch_size=batch_size, num_workers=num_workers)
     steps_per_epoch = len(data.train)
